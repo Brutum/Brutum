@@ -1,6 +1,6 @@
 .gitignore
 
-CXXFLAGS += -Wall -Wextra -pedantic -std=c++11
+CXXFLAGS += -Wall -Wextra -Wno-unused-parameter -Werror -pedantic -std=c++11
 
 # don't bring up the console window
 ifeq (@(TUP_PLATFORM),win32)
@@ -20,9 +20,9 @@ LDFLAGS += `pkg-config luajit --libs`
 
 ifeq (@(TUP_PLATFORM),win32)
   # assuming using MSYS or Cygwin or anything similar
-  : foreach src/*.cpp |> sh -c 'g++ -c \'%f\' -o \'%o\' $(CXXFLAGS)' |> %B.o {objs}
-  : {objs} |> sh -c 'g++ %f -o %o $(LDFLAGS)' |> Brutum.exe
+  : foreach src/*.cpp |> ^ C++ %f^ sh -c 'g++ -c \'%f\' -o \'%o\' $(CXXFLAGS)' |> %B.o {objs}
+  : {objs} |> ^ LD %f^ sh -c 'g++ %f -o %o $(LDFLAGS)' |> Brutum.exe
 else
-  : foreach src/*.cpp |> g++ -c %f -o %o $(CXXFLAGS) |> %B.o {objs}
-  : {objs} |> g++ %f -o %o $(LDFLAGS) |> Brutum
+  : foreach src/*.cpp |> ^ C++ %f^ g++ -c %f -o %o $(CXXFLAGS) |> %B.o {objs}
+  : {objs} |> ^ LD %f^ g++ %f -o %o $(LDFLAGS) |> Brutum
 endif
