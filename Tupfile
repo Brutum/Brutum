@@ -1,0 +1,13 @@
+.gitignore
+
+CXXFLAGS = -Wall -Wextra -pedantic -std=c++11
+CXXFLAGS += -I./includes
+LDFLAGS = -mwindows -lsfml-graphics -lsfml-window -lsfml-system
+
+: foreach src/*.cpp |> g++ -c %f -o %o $(CXXFLAGS) |> %B.o {objs}
+
+ifeq (@(TUP_PLATFORM),win32)
+  : {objs} |> g++ %f -o %o $(LDFLAGS) |> Brutum.exe
+else
+  : {objs} |> g++ %f -o %o $(LDFLAGS) |> Brutum
+endif
