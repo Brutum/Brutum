@@ -1,13 +1,28 @@
 .gitignore
 
-CXXFLAGS = -Wall -Wextra -pedantic -std=c++11
-CXXFLAGS += -I./include
-LDFLAGS = -mwindows -lsfml-graphics -lsfml-window -lsfml-system -llua -lm
+CXXFLAGS += -Wall -Wextra -pedantic -std=c++11
 
-: foreach src/*.cpp |> g++ -c %f -o %o $(CXXFLAGS) |> %B.o {objs}
+# don't bring up the console window
+ifeq (@(TUP_PLATFORM),win32)
+  LDFLAGS = -mwindows
+endif
+
+# add the include directory
+CXXFLAGS += -Iinclude
+
+# SFML
+CXXFLAGS += `pkg-config sfml-all --cflags`
+LDFLAGS += `pkg-config sfml-all --libs`
+
+# Luajit
+CXXFLAGS += `pkg-config luajit --cflags`
+LDFLAGS += `pkg-config luajit --libs`
 
 ifeq (@(TUP_PLATFORM),win32)
-  : {objs} |> g++ %f -o %o $(LDFLAGS) |> Brutum.exe
+  # assuming using MSYS or Cygwin or anything similar
+  : foreach src/*.cpp |> sh -c 'g++ -c \'%f\' -o \'%o\' $(CXXFLAGS)' |> %B.o {objs}
+  : {objs} |> sh -c 'g++ %f -o %o $(LDFLAGS)' |> Brutum.exe
 else
+  : foreach src/*.cpp |> g++ -c %f -o %o $(CXXFLAGS) |> %B.o {objs}
   : {objs} |> g++ %f -o %o $(LDFLAGS) |> Brutum
 endif
