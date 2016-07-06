@@ -1,7 +1,7 @@
 .gitignore
 
 CXXFLAGS = -Wall -Wextra -pedantic -std=c++11
-CXXFLAGS += -I./includes
+CXXFLAGS += -I./include
 LDFLAGS = -mwindows -lsfml-graphics -lsfml-window -lsfml-system
 
 : foreach src/*.cpp |> g++ -c %f -o %o $(CXXFLAGS) |> %B.o {objs}
